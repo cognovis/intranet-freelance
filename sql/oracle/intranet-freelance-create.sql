@@ -107,7 +107,6 @@ set url='/intranet-freelance/index'
 where label='users_freelancers';
 
 
-
 -----------------------------------------------------------
 -- We need to define this function as a type of "join(..., ", ") to
 -- get the list of skills for each user and skill type.
@@ -329,59 +328,52 @@ extra_select, extra_where, sort_order, visible_for) values (5008,50,NULL,'Home P
 commit;
 
 
+delete from im_view_columns where column_id >= 5100 and column_id < 5199;
+--
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5102,51,NULL,'Recruiting Source',
-'$rec_source','','',2,'im_permission $user_id view_freelancers');
+'$rec_source','','',2,'im_user_permissions_admin_freelancers $current_user_id');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5104,51,NULL,'Recruiting Status',
-'$rec_status','','',4,'im_permission $user_id view_freelancers');
+'$rec_status','','',4,'im_user_permissions_admin_freelancers $current_user_id');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5106,51,NULL,'Recruiting Test Type',
-'$rec_test_type','','',6,'im_permission $user_id view_freelancers');
+'$rec_test_type','','',6,'im_user_permissions_admin_freelancers $current_user_id');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5108,51,NULL,'Recruiting Test Result',
-'$rec_test_result','','',8,'im_permission $user_id view_freelancers');
-
+'$rec_test_result','','',8,'im_user_permissions_admin_freelancers $current_user_id');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5112,51,NULL,'Trans Rate',
 '$translation_rate','','',12,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5114,51,NULL,'Editing Rate',
 '$editing_rate','','',14,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5116,51,NULL,'Hourly Rate',
 '$hourly_rate','','',16,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5118,51,NULL,'Bank Account',
 '$bank_account','','',18,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5120,51,NULL,'Bank',
 '$bank','','',20,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5132,51,NULL,'Payment Method',
 '$payment_method','','',22,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5124,51,NULL,'Note',
 '<blockqote>$note</blockquote>','','',24,
-'im_permission $user_id view_freelancers');
-
+'');
 insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
 extra_select, extra_where, sort_order, visible_for) values (5126,51,NULL,'Private Note',
 '<blockqote>$private_note</blockquote>','','',26,
-'im_permission $user_id view_freelancers');
-
+'');
 commit;
 
 
