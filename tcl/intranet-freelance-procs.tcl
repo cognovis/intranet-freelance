@@ -318,7 +318,7 @@ ad_proc im_freelance_info_component { current_user_id user_id return_url freelan
     # if the row makes references to "private Note" and the user isn't
     # adminstrator, this row don't appear in the browser.
     db_foreach column_list_sql $column_sql {
-        if {1 || [eval $visible_for]} {
+        if {"" == $visible_for || [eval $visible_for]} {
 	    if { ![string equal "Private Note" $column_name] || $admin} {
 	        append freelance_html "
                 <tr $td_class([expr $ctr % 2])>
