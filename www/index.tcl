@@ -35,7 +35,7 @@ ad_page_contract {
     { letter:trim "all" }
     { view_name "" }
     { rec_status_id 0 }
-    { rec_test_result_id 0 }
+    { rec_test_result_id 6100 }
     { source_language_id 0 }
     { target_language_id 0 }
 }
@@ -229,7 +229,7 @@ set languages [im_memoize_list select_languages \
         "select category_id, category
          from im_categories
 	 where category_type = 'Intranet Translation Language'
-         order by lower(category_id)"]
+         order by lower(category)"]
 set languages [linsert $languages 0 0 All]
 
 # ---------------------------------------------------------------
@@ -241,9 +241,12 @@ set bind_vars [ns_set create]
 
 if { $user_group_id > 0 } {
     append page_title " in group \"$user_group_name\""
-    lappend extra_wheres "u.user_id = m.member_id"
-    lappend extra_wheres "m.group_id = :user_group_id"
-    lappend extra_froms "group_distinct_member_map m"
+    lappend extra_wheres "u.user_id = group_members.member_id"
+    lappend extra_froms "(
+		select distinct m.member_id
+		from group_member_map m
+		where m.group_id = :user_group_id
+	) group_members"
 }
 
 # Show DynVal variables
@@ -271,21 +274,57 @@ if { -1 == $user_group_id} {
     lappend extra_wheres "u.user_id not in (select distinct member_id from group_distinct_member_map where group_id >= 0)"
 }
 
-if {$rec_status_id} {
-    lappend extra_wheres "f.rec_status_id = :rec_status_id"
-}
-
 if {$source_language_id} {
-    lappend extra_wheres "u.user_id in (select distinct user_id from im_freelance_skills where skill_type_id=2000 and skill_id = :source_language_id)"
+    set source_language [db_string source_language "select im_category_from_id(:source_language_id) from dual"]
+    set source_language_len [string len $source_language]
+
+    lappend extra_wheres "u.user_id in (
+	select distinct 
+		user_id 
+	from 
+		im_freelance_skills 
+	where 
+		skill_type_id=2000 
+		and im_category_from_id(skill_id) like '$source_language%'
+    )"
 }
 
 if {$target_language_id} {
-    lappend extra_wheres "u.user_id in (select distinct user_id from im_freelance_skills where skill_type_id=2002 and skill_id = :target_language_id)"
+    set target_language [db_string target_language "select im_category_from_id(:target_language_id) from dual"]
+    set target_language_len [string len $target_language]
+
+    lappend extra_wheres "u.user_id in (
+	select distinct 
+		user_id 
+	from 
+		im_freelance_skills 
+	where 
+		skill_type_id=2002
+		and im_category_from_id(skill_id) like '$target_language%'
+    )"
 }
 
+set org_rec_test_result_id $rec_test_result_id
 if {$rec_test_result_id} {
-    lappend extra_wheres "f.rec_test_result_id = :rec_test_result_id"
+    lappend extra_froms "(
+		select distinct user_id 
+		from	im_freelancers f 
+		where	f.rec_test_result_id = :rec_test_result_id
+	) rec_test_users"
+    lappend extra_wheres "u.user_id = rec_test_users.user_id"
 }
+
+set org_rec_status_id $rec_status_id
+if {$rec_status_id} {
+    lappend extra_froms "(
+		select distinct user_id 
+		from	im_freelancers f 
+		where	f.rec_status_id = :rec_status_id
+	) rec_status_users"
+    lappend extra_wheres "u.user_id = rec_status_users.user_id"
+}
+
+
 
 if { ![empty_string_p $letter] && [string compare $letter "ALL"] != 0 && [string compare $letter "SCROLL"] != 0 } {
     set letter [string toupper $letter]
@@ -515,3 +554,8 @@ if { $start_idx > 1 } {
 
 # nothing to do here ... (?)
 set table_continuation_html ""
+
+
+
+set rec_test_result_id $org_rec_test_result_id
+set rec_status_id $org_rec_status_id

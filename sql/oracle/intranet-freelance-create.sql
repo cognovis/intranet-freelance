@@ -46,6 +46,11 @@ create table im_freelancers (
                                 references im_categories
 );
 
+create index im_freelancers_tstatus_idx on im_freelancers(rec_status_id);
+create index im_freelancers_tresult_idx on im_freelancers(rec_test_result_id);
+
+
+
 -----------------------------------------------------------
 -- Skills
 --
