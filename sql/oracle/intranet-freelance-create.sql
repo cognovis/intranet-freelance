@@ -25,9 +25,9 @@ create table im_freelancers (
 				primary key 
 				constraint im_freelancers_user_fk
 				references users,
-	translation_rate	number(6,2),
-	editing_rate		number(6,2),
-	hourly_rate		number(6,2),
+	translation_rate	number(12,3),
+	editing_rate		number(12,3),
+	hourly_rate		number(12,3),
 	bank_account		varchar(200),
 	bank			varchar(100),
 	payment_method_id	integer
