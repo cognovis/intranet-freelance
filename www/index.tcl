@@ -36,6 +36,8 @@ ad_page_contract {
     { view_name "" }
     { rec_status_id 0 }
     { rec_test_result_id 0 }
+    { source_language_id 0 }
+    { target_language_id 0 }
 }
 
 
@@ -132,7 +134,7 @@ if {"" == $view_name} {
 
     # Check if there is a specific view for this user group:
     set specific_view_name "[string tolower $user_group_name]_list"
-    ns_log Notice "/users/index: Checking if view='$specific_view_name' exists:"
+    ns_log Notice "/intranet-freelance/index: Checking if view='$specific_view_name' exists:"
     set expcific_view_exists [db_string specific_view_exists "select count(*) from im_views where view_name=:specific_view_name"]
     if {$expcific_view_exists} {
 	set view_name $specific_view_name
@@ -198,7 +200,7 @@ db_foreach column_list_sql $column_sql {
 	}
     }
 }
-ns_log Notice "/users/index.tcl: column_vars=$column_vars"
+ns_log Notice "/intranet-freelance/index.tcl: column_vars=$column_vars"
 
 
 # ---------------------------------------------------------------
@@ -221,6 +223,14 @@ set rec_test_results [im_memoize_list select_project_rec_test_results \
          order by lower(category_id)"]
 set rec_test_results [linsert $rec_test_results 0 0 All]
 
+
+# languages is a list of pairs of (language_id, language)
+set languages [im_memoize_list select_languages \
+        "select category_id, category
+         from im_categories
+	 where category_type = 'Intranet Translation Language'
+         order by lower(category_id)"]
+set languages [linsert $languages 0 0 All]
 
 # ---------------------------------------------------------------
 # 5. Generate SQL Query
@@ -263,6 +273,14 @@ if { -1 == $user_group_id} {
 
 if {$rec_status_id} {
     lappend extra_wheres "f.rec_status_id = :rec_status_id"
+}
+
+if {$source_language_id} {
+    lappend extra_wheres "u.user_id in (select distinct user_id from im_freelance_skills where skill_type_id=2000 and skill_id = :source_language_id)"
+}
+
+if {$target_language_id} {
+    lappend extra_wheres "u.user_id in (select distinct user_id from im_freelance_skills where skill_type_id=2002 and skill_id = :target_language_id)"
 }
 
 if {$rec_test_result_id} {
@@ -336,21 +354,44 @@ select
 	c.wa_postal_code,
 	c.wa_country_code,
 	c.note,
-	c.current_information
+	c.current_information,
+        CONCAT_LIST(skills.source_languages, ', ') as source_languages,
+        CONCAT_LIST(skills.target_languages, ', ') as target_languages
 	$extra_select
 from 
 	registered_users u, 
 	users_contact c,
 	persons p,
-	acs_objects o
+	acs_objects o,
+        (select
+		u.user_id,
+                CAST(MULTISET(
+                        SELECT  im_category_from_id(skill_id) as skill
+                        FROM    im_freelance_skills fs
+                        WHERE   fs.user_id = u.user_id
+                                and fs.skill_type_id = 2000
+                ) AS varchar_list_t) as source_languages,
+                CAST(MULTISET(
+                        SELECT  im_category_from_id(skill_id) as skill
+                        FROM    im_freelance_skills fs
+                        WHERE   fs.user_id = u.user_id
+                                and fs.skill_type_id = 2002
+                ) AS varchar_list_t) as target_languages
+        FROM    users u
+        GROUP BY 
+		u.user_id
+        ) skills
 	$extra_from
 where 
-	u.user_id=p.person_id
+	u.user_id = p.person_id
 	and u.user_id=c.user_id(+)
 	and u.user_id = o.object_id
+	and u.user_id = skills.user_id(+)
 	$extra_where
 $extra_order_by
 "
+
+# ad_return_complaint 1 "<pre>$sql</pre>"
 
 # ---------------------------------------------------------------
 # 5a. Limit the SQL query to MAX rows and provide << and >>
@@ -377,45 +418,9 @@ from
 	($sql) t
 "]
 
-    ns_log Notice "/users/index.tcl: sql=$sql"
-    ns_log Notice "/users/index.tcl: total_in_limited=$total_in_limited"
+    ns_log Notice "/intranet-freelance/index.tcl: sql=$sql"
+    ns_log Notice "/intranet-freelance/index.tcl: total_in_limited=$total_in_limited"
 }
-
-# ---------------------------------------------------------------
-# 6. Format the Filter
-# ---------------------------------------------------------------
-
-set filter_html "
-<form method=get action='/intranet-freelance/index'>
-[export_form_vars user_group_name start_idx order_by how_many view_name letter]
-
-<table border=0 cellpadding=1 cellspacing=1>
-  <tr>
-    <td colspan='2' class=rowtitle align=center>
-      Filter Freelancers
-    </td>
-  </tr>
-  <tr>
-    <td valign=top>Recruiting Status:</td>
-    <td valign=top>
-      [im_select rec_status_id $rec_stati $rec_status_id]
-    </td>
-  </tr>
-  <tr>
-    <td valign=top>Recruiting Test Result:</td>
-    <td valign=top>
-      [im_select rec_test_result_id $rec_test_results $rec_test_result_id]
-    </td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>
-      <input type=submit value=Go name=submit>
-    </td>
-  </tr>
-</table>
-</form>
-"
 
 # ---------------------------------------------------------------
 # 7. Format the List Table Header
@@ -453,23 +458,25 @@ set bgcolor(0) " class=roweven "
 set bgcolor(1) " class=rowodd "
 set ctr 0
 set idx $start_idx
+
 db_foreach projects_info_query $query {
 
-    # Append together a line of data based on the "column_vars" parameter list
-    append table_body_html "<tr$bgcolor([expr $ctr % 2])>\n"
-    foreach column_var $column_vars {
-	append table_body_html "\t<td valign=top>"
-	set cmd "append table_body_html $column_var"
-	eval $cmd
-	append table_body_html "</td>\n"
-    }
-    append table_body_html "</tr>\n"
-
-    incr ctr
-    if { $how_many > 0 && $ctr >= $how_many } {
-	break
-    }
-    incr idx
+	# Append together a line of data based on the "column_vars" 
+	# parameter list
+	append table_body_html "<tr$bgcolor([expr $ctr % 2])>\n"
+	foreach column_var $column_vars {
+	    append table_body_html "\t<td valign=top>"
+	    set cmd "append table_body_html $column_var"
+	    eval $cmd
+	    append table_body_html "</td>\n"
+	}
+	append table_body_html "</tr>\n"
+	
+	incr ctr
+	if { $how_many > 0 && $ctr >= $how_many } {
+	    break
+	}
+	incr idx
 }
 
 # Show a reasonable message when there are no result rows:
@@ -505,8 +512,6 @@ if { $start_idx > 1 } {
 # ---------------------------------------------------------------
 # 9. Format Table Continuation
 # ---------------------------------------------------------------
-
-set navbar_html [im_user_navbar $letter "/intranet/users/index" $next_page_url $previous_page_url [list start_idx order_by how_many view_name user_group_name letter] $menu_select_label]
 
 # nothing to do here ... (?)
 set table_continuation_html ""

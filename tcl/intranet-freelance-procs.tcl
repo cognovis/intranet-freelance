@@ -19,6 +19,9 @@ ad_library {
 # Constant functions
 # ----------------------------------------------------------------------
 
+ad_proc -public im_freelance_skill_source_language_id {} { return 2000 }
+ad_proc -public im_freelance_skill_target_language_id {} { return 2002 }
+
 ad_proc -public im_freelance_recruiting_status_potential {} { return 6000 }
 ad_proc -public im_freelance_recruiting_status_test_sent {} { return 6002 }
 ad_proc -public im_freelance_recruiting_status_test_received {} { return 6004 }
@@ -27,6 +30,7 @@ ad_proc -public im_freelance_recruiting_status_rest_evaluated {} { return 6006 }
 ad_proc -public im_freelance_recruiting_test_result_a {} { return 6100 }
 ad_proc -public im_freelance_recruiting_status_result_b {} { return 6102 }
 ad_proc -public im_freelance_recruiting_status_result_c {} { return 6104 }
+
 
 
 # ----------------------------------------------------------------------

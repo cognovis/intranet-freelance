@@ -188,10 +188,80 @@ extra_select, extra_where, sort_order, visible_for, order_by_clause) values
 (5210,52,NULL,'Recr Test','$rec_test_result',
 'im_category_from_id(rec_test_result_id) as rec_test_result','',10,'',
 'order by rec_test_result_id');
+
+delete from im_view_columns where column_id = 5212;
+insert into im_view_columns (column_id, view_id, group_id, 
+column_name, column_render_tcl, extra_select, extra_where, 
+sort_order, visible_for, order_by_clause) values
+(5212,52,NULL,'Source Langs','$source_languages','','',12,'','');
+commit;
+
+delete from im_view_columns where column_id = 5214;
+insert into im_view_columns (column_id, view_id, group_id, 
+column_name, column_render_tcl, extra_select, extra_where, 
+sort_order, visible_for, order_by_clause) values
+(5214,52,NULL,'Target Langs','$target_languages','','',14,'','');
 --
 commit;
 
 
+
+CREATE TYPE number_list_t AS TABLE OF NUMBER;
+/
+show errors;
+
+CREATE TYPE varchar_list_t AS TABLE OF VARCHAR(1000);
+/
+show errors;
+
+
+CREATE or REPLACE function CONCAT_LIST ( 
+	lst IN 		varchar_list_t, 
+	separator	varchar
+) RETURN VARCHAR IS
+	ret varchar(1000); 
+	j integer;
+	l integer;
+BEGIN 
+	l := lst.LAST;
+	if l is null then 
+	    RETURN ret;
+	end if;
+        FOR j IN 1 .. l LOOP
+		if ret is not null then
+			ret := ret || separator;
+		end if;
+		ret := ret || lst(j);
+        END LOOP;
+	RETURN ret; 
+END; 
+/
+show errors;
+
+
+SELECT
+	s.user_id,
+	CONCAT_LIST(s.source_languages, ', ') as source_languages,
+	CONCAT_LIST(s.target_languages, ', ') as target_languages
+from
+	(SELECT u.user_id, 
+	        CAST(MULTISET(
+			SELECT	im_category_from_id(skill_id) as skill
+			FROM	im_freelance_skills fs 
+			WHERE	fs.user_id = u.user_id
+				and fs.skill_type_id = 2000
+		) AS varchar_list_t) as source_languages,
+	        CAST(MULTISET(
+			SELECT	im_category_from_id(skill_id) as skill
+			FROM	im_freelance_skills fs 
+			WHERE	fs.user_id = u.user_id
+				and fs.skill_type_id = 2002
+		) AS varchar_list_t) as target_languages
+	FROM 	users u
+	WHERE	u.user_id is not null 
+	GROUP BY user_id
+	) s
+;
 
 
 -- Freelance Skill Types
