@@ -34,7 +34,16 @@ create table im_freelancers (
 				constraint im_freelancers_payment_fk
 				references im_categories,
 	note			varchar(4000),
-	private_note		varchar(4000)
+	private_note		varchar(4000),
+        -- Freelance Recruiting
+        rec_source              varchar(400),
+        rec_status_id           integer
+                                constraint im_freelancers_rec_stat_fk
+                                references im_categories,
+        rec_test_type           varchar(400),
+        rec_test_result_id      integer
+                                constraint im_freelancers_rec_test_fk
+                                references im_categories
 );
 
 -----------------------------------------------------------
@@ -171,25 +180,34 @@ INSERT INTO im_categories VALUES (2354,'Linux','','Intranet Operating System','c
 -- Add 'user_list_freelance'
 delete from im_view_columns where column_id >= 5000 and column_id < 5099;
 
-insert into im_view_columns values (5000,50,NULL,'Name',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5000,50,NULL,'Name',
 '"<a href=/intranet/users/view?user_id=$user_id>$name</a>"','','',2,
 'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5001,50,NULL,'Email',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5001,50,NULL,'Email',
 '"<a href=mailto:$email>$email</a>"','','',3,
 'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5002,50,NULL,'Status',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5002,50,NULL,'Status',
 '$status','','',4,'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5003,50,NULL,'Src Lang',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5003,50,NULL,'Src Lang',
 '$source_languages','','',5,'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5004,50,NULL,'Tgt Lang',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5004,50,NULL,'Tgt Lang',
 '$target_languages','','',6,'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5005,50,NULL,'Subj Area',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5005,50,NULL,'Subj Area',
 '$subjects','','',7,'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5006,50,NULL,'Work Phone',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5006,50,NULL,'Work Phone',
 '$work_phone','','',8,'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5007,50,NULL,'Cell Phone',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5007,50,NULL,'Cell Phone',
 '$cell_phone','','',9,'im_permission $user_id view_freelancers');
-insert into im_view_columns values (5008,50,NULL,'Home Phone',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5008,50,NULL,'Home Phone',
 '$home_phone','','',10,'im_permission $user_id view_freelancers');
 commit;
 
@@ -197,35 +215,43 @@ commit;
 -- Add 'user_view_freelance'
 delete from im_view_columns where column_id >= 5100 and column_id < 5199;
 
-insert into im_view_columns values (5102,51,NULL,'Trans Rate',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5102,51,NULL,'Trans Rate',
 '$translation_rate','','',2,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5104,51,NULL,'Editing Rate',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5104,51,NULL,'Editing Rate',
 '$editing_rate','','',4,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5106,51,NULL,'Hourly Rate',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5106,51,NULL,'Hourly Rate',
 '$hourly_rate','','',6,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5108,51,NULL,'Bank Account',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5108,51,NULL,'Bank Account',
 '$bank_account','','',8,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5110,51,NULL,'Bank',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5110,51,NULL,'Bank',
 '$bank','','',10,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5112,51,NULL,'Payment Method',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5112,51,NULL,'Payment Method',
 '$payment_method','','',12,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5114,51,NULL,'Note',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5114,51,NULL,'Note',
 '<blockqote>$note</blockquote>','','',14,
 'im_permission $user_id view_freelancers');
 
-insert into im_view_columns values (5116,51,NULL,'Private Note',
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (5116,51,NULL,'Private Note',
 '<blockqote>$private_note</blockquote>','','',16,
 'im_permission $user_id view_freelancers');
 
