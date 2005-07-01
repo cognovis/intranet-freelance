@@ -84,7 +84,8 @@ values (5210,52,NULL,'Recr Test','$rec_test_result',
 
 
 -- Freelance Skill Types
-delete from im_categories where category_id >= 2000 and category_id < 2100;
+-- delete from im_categories where category_id >= 2000 and category_id < 2100;
+delete from im_categories where category_type = 'Intranet Skill Type';
 INSERT INTO im_categories VALUES (2000,'Source Language','Intranet Translation Language','Intranet Skill Type','category','t','f');
 INSERT INTO im_categories VALUES (2002,'Target Language','Intranet Translation Language','Intranet Skill Type','category','t','f');
 INSERT INTO im_categories VALUES (2004,'Sworn Language','Intranet Translation Language','Intranet Skill Type','category','t','f');
@@ -95,7 +96,8 @@ INSERT INTO im_categories VALUES (2014,'Subjects','Intranet Translation Subject 
 
 
 -- Freelance TM Tools
-delete from im_categories where category_id >= 2100 and category_id < 2200;
+-- delete from im_categories where category_id >= 2100 and category_id < 2200;
+delete from im_categories where category_type = 'Intranet TM Tool';
 INSERT INTO im_categories VALUES (2100,'Trados 3.x','','Intranet TM Tool','category','t','f');
 INSERT INTO im_categories VALUES (2102,'Trados 5.x','','Intranet TM Tool','category','t','f');
 INSERT INTO im_categories VALUES (2104,'Trados 5.5','','Intranet TM Tool','category','t','f');
@@ -104,7 +106,8 @@ INSERT INTO im_categories VALUES (2108,'IBM Translation Workbench','','Intranet 
 
 
 -- Languages experience
-delete from im_categories where category_id >= 2200 and category_id < 2300;
+-- delete from im_categories where category_id >= 2200 and category_id < 2300;
+delete from im_categories where category_type = 'Intranet Experience Level';
 INSERT INTO im_categories VALUES (2200, 'Unconfirmed','',
 'Intranet Experience Level','category','t','f');
 INSERT INTO im_categories VALUES (2201, 'Low','',
@@ -116,10 +119,12 @@ INSERT INTO im_categories VALUES (2203, 'High','',
 
 
 -- Freelance LOC Tools
-delete from im_categories where category_id >= 2300 and category_id < 2400;
+-- delete from im_categories where category_id >= 2300 and category_id < 2400;
+delete from im_categories where category_type = 'Intranet LOC Tool';
 INSERT INTO im_categories VALUES (2300,'Pasolo ','','Intranet LOC Tool','category','t','f');
 INSERT INTO im_categories VALUES (2302,'Catalyst','','Intranet LOC Tool','category','t','f');
 -- Operating Systems catgory_id (2350 -> 2399)
+delete from im_categories where category_type = 'Intranet Operating System';
 INSERT INTO im_categories VALUES (2350,'Windows 98','','Intranet Operating System','category','t','f');
 INSERT INTO im_categories VALUES (2351,'Windows NT','','Intranet Operating System','category','t','f');
 INSERT INTO im_categories VALUES (2352,'Windows 2000','','Intranet Operating System','category','t','f');
@@ -132,6 +137,7 @@ INSERT INTO im_categories VALUES (2354,'Linux','','Intranet Operating System','c
 -- ------------------------------------------------------------
 
 -- Intranet Recruiting Status
+delete from im_categories where category_type = 'Intranet Recruiting Status';
 insert into im_categories
 ( CATEGORY_DESCRIPTION, ENABLED_P, CATEGORY_ID, CATEGORY, CATEGORY_TYPE)
 values ('', 'f', '6000', 'Potential Freelancer', 'Intranet Recruiting Status');
@@ -152,6 +158,7 @@ values ('', 'f', '6006', 'Test evaluated', 'Intranet Recruiting Status');
 
 
 -- Intranet Recruiting Test Results
+delete from im_categories where category_type = 'Intranet Recruiting Test Result';
 insert into im_categories
 ( CATEGORY_DESCRIPTION, ENABLED_P, CATEGORY_ID, CATEGORY, CATEGORY_TYPE)
 values ('', 'f', '6100', 'A - Test approved', 'Intranet Recruiting Test Result');
