@@ -158,10 +158,10 @@ if {"" != $skill_table} {
 	<tr>
 	  <td></td>
 	  <td colspan=2 align=center>
-	    <input type=submit value=\"[_ intranet-freelance.Update]\" name=submit>
+	    <input type=submit name=button_update value=\"[_ intranet-freelance.Update]\" name=submit>
 	  </td>
 	  <td>
-	    <input type=submit value=\"[_ intranet-freelance.Del]\" name=submit>
+	    <input type=submit name=button_del value=\"[_ intranet-freelance.Del]\" name=submit>
 	  </td>
 	</tr>"
 } else {
@@ -197,7 +197,7 @@ append skill_table "
 [im_category_select_plain $value_range_category_type "add_skill_id" ""]
 	  </td>
 	  <td colspan=3>
-	    <input type=submit value=\"[_ intranet-freelance.Add]\" name=submit>
+	    <input type=submit name=button_add value=\"[_ intranet-freelance.Add]\" name=submit>
 	  </td>
 	</tr>
 "
