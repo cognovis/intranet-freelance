@@ -141,62 +141,63 @@ BEGIN
 end;' language 'plpgsql';
 
 
-
 -- Show the freelance information in users view page
 --
 select im_component_plugin__new (
-        null,                           -- plugin_id
-        'acs_object',                   -- object_type
-        now(),                          -- creation_date
-        null,                           -- creation_user
-        null,                           -- creation_ip
-        null,                           -- context_id
-        'Users Freelance Component',    -- plugin_name
-        'intranet-freelance',           -- package_name
-        'left',                       -- location
-        '/intranet/users/view',         -- page_url
-        null,                           -- view_name
-        90,                             -- sort_order
-        'im_freelance_info_component $current_user_id $user_id $return_url [im_opt_val freelance_view_name]'
+	null,			   -- plugin_id
+	'acs_object',		   -- object_type
+	now(),			  -- creation_date
+	null,			   -- creation_user
+	null,			   -- creation_ip
+	null,			   -- context_id
+	'Users Freelance Component',    -- plugin_name
+	'intranet-freelance',	   -- package_name
+	'left',		       -- location
+	'/intranet/users/view',	 -- page_url
+	null,			   -- view_name
+	90,			     -- sort_order
+	'im_freelance_info_component $current_user_id $user_id $return_url [im_opt_val freelance_view_name]'
     );
 
 
 -- Show the freelance skills in users view page
 --
 select im_component_plugin__new (
-        null,                           -- plugin_id
-        'acs_object',                   -- object_type
-        now(),                          -- creation_date
-        null,                           -- creation_user
-        null,                           -- creation_ip
-        null,                           -- context_id
-        'Users Skills Component',       -- plugin_name
-        'intranet-freelance',           -- package_name
-        'bottom',                       -- location
-        '/intranet/users/view',         -- page_url
-        null,                           -- view_name
-        80,                             -- sort_order
-        'im_freelance_skill_component $current_user_id $user_id $return_url'
+	null,			   -- plugin_id
+	'acs_object',		   -- object_type
+	now(),			  -- creation_date
+	null,			   -- creation_user
+	null,			   -- creation_ip
+	null,			   -- context_id
+	'Users Skills Component',       -- plugin_name
+	'intranet-freelance',	   -- package_name
+	'bottom',		       -- location
+	'/intranet/users/view',	 -- page_url
+	null,			   -- view_name
+	80,			     -- sort_order
+	'im_freelance_skill_component $current_user_id $user_id $return_url'
     );
 
 
 -- Show the freelance list in member-add page
 --
 select im_component_plugin__new (
-        null,                           -- plugin_id
-        'acs_object',                   -- object_type
-        now(),                          -- creation_date
-        null,                           -- creation_user
-        null,                           -- creation_ip
-        null,                           -- context_id
-        'freelance list Component',     -- plugin_name
-        'intranet-freelance',           -- package_name
-        'bottom',                       -- location
-        '/intranet/member-add',         -- page_url
-        null,                           -- view_name
-        10,                             -- sort_order
-        'im_freelance_member_select_component $object_id $return_url'
+	null,			   -- plugin_id
+	'acs_object',		   -- object_type
+	now(),			  -- creation_date
+	null,			   -- creation_user
+	null,			   -- creation_ip
+	null,			   -- context_id
+	'freelance list Component',     -- plugin_name
+	'intranet-freelance',	   -- package_name
+	'bottom',		       -- location
+	'/intranet/member-add',	 -- page_url
+	null,			   -- view_name
+	10,			     -- sort_order
+	'im_freelance_member_select_component $object_id $return_url'
     );
 
+\i intranet-freelance-score.sql
 \i ../common/intranet-freelance-common.sql
 \i ../common/intranet-freelance-backup.sql
+
