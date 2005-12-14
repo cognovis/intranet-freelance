@@ -60,13 +60,14 @@ select
 from 
 	persons p,
 	acs_objects o,
-	registered_users u
-	LEFT OUTER JOIN users_contact c USING (user_id)
-	LEFT OUTER JOIN im_freelancers f USING (user_id)
+	cc_users u
+	LEFT OUTER JOIN users_contact c on (u.user_id = c.user_id)
+	LEFT OUTER JOIN im_freelancers f on (u.user_id = f.user_id)
 	$extra_from
 where 
 	u.user_id = p.person_id
 	and u.user_id = o.object_id
+	and u.member_state = 'approved'
 	$extra_where
     
     </querytext>
