@@ -24,7 +24,7 @@ select
 	u.last_visit,
 	u.second_to_last_visit,
 	u.n_sessions,
-	o.creation_date,
+	u.creation_date,
 	im_email_from_user_id(u.user_id) as email,
 	im_name_from_user_id(u.user_id) as name,
 	p.first_names,
@@ -59,16 +59,15 @@ select
 	$extra_select
 from 
 	persons p,
-	acs_objects o,
 	cc_users u
 	LEFT OUTER JOIN users_contact c on (u.user_id = c.user_id)
 	LEFT OUTER JOIN im_freelancers f on (u.user_id = f.user_id)
 	$extra_from
 where 
 	u.user_id = p.person_id
-	and u.user_id = o.object_id
 	and u.member_state = 'approved'
 	$extra_where
+$extra_order_by
     
     </querytext>
   </fullquery>

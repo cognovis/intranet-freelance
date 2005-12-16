@@ -209,9 +209,9 @@ set bind_vars [ns_set create]
 
 if { $user_group_id > 0 } {
     append page_title " in group \"$user_group_name\""
+
+    lappend extra_froms "(select member_id from group_distinct_member_map m where group_id = :user_group_id) m"
     lappend extra_wheres "u.user_id = m.member_id"
-    lappend extra_wheres "m.group_id = :user_group_id"
-    lappend extra_froms "group_distinct_member_map m"
 }
 
 if { -1 == $user_group_id} {
