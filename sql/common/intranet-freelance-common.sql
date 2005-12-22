@@ -9,10 +9,14 @@
 -- @author frank.bergmann@project-open.com
 
 
+-----------------------------------------------------------
+-- Shortcut view to freelance skills
+--
 create or replace view im_freelance_skill_types as 
 select category_id as skill_type_id, category as skill_type
 from im_categories 
 where category_type = 'Intranet Skill Type';
+
 
 -----------------------------------------------------------
 -- Menu Modifications
