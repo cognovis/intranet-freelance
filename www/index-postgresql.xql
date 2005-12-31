@@ -54,8 +54,6 @@ select
 	c.current_information,
 	f.bank_account, f.bank, f.payment_method_id, f.rec_source, 
 	f.rec_status_id, f.rec_test_type, f.rec_test_result_id,
-	im_category_from_id(f.rec_status_id) as rec_status,
-	im_category_from_id(f.rec_test_result_id) as rec_test_result
 	$extra_select
 from 
 	persons p,
@@ -68,7 +66,6 @@ where
 	and u.member_state = 'approved'
 	$extra_where
 $extra_order_by
-    
     </querytext>
   </fullquery>
 </queryset>

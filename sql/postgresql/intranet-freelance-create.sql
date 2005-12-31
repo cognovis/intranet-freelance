@@ -249,7 +249,7 @@ select im_priv_create('add_freelance_skillconfs','Freelance Managers');
 
 
 
-\i intranet-freelance-score.sql
+-- \i intranet-freelance-score.sql
 \i ../common/intranet-freelance-common.sql
 \i ../common/intranet-freelance-backup.sql
 

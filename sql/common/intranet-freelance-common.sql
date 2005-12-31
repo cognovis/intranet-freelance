@@ -82,6 +82,12 @@ values (5210,52,NULL,'Recr Test','$rec_test_result',
 'im_category_from_id(rec_test_result_id) as rec_test_result','',10,'',
 'order by rec_test_result_id');
 
+-- Add a "Score" column to check how freelancer fit with a specific project
+-- delete from im_view_columns where column_id=5212;
+-- insert into im_view_columns (column_id, view_id, group_id, column_name,
+-- column_render_tcl, extra_select, extra_where, sort_order, visible_for, order_by_clause)
+-- values (5212,52,NULL,'Score','$score','','',10,'','order by coalesce(s.score, 0) DESC');
+
 
 
 

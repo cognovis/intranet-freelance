@@ -40,48 +40,98 @@ declare
 	p_target_lang_id		alias for $4;
 	p_task_uom_id			alias for $5;
 	p_currency			alias for $6;
-	price_row			RECORD;
+
+	p_source_lang			varchar;
+	p_target_lang			varchar;
+
+        row                             RECORD;
+        price_row                       RECORD;
+
 	max_price			real;
 	min_price			real;
 	ret				real ARRAY[2];
 BEGIN
+	select im_category_from_id(p_source_lang_id) into p_source_lang;
+	select im_category_from_id(p_target_lang_id) into p_target_lang;
+
 	min_price = 1000000;
 	max_price = 0;
-	ret = ''{1, 2}'';
-	FOR price_row IN
-		select
-			p.relevancy,
-			p.price
-		from    ( (select
-				im_trans_prices_calc_relevancy (
-					p.company_id,  p.company_id,
-					p.task_type_id, p_task_type_id,
-					p.subject_area_id, p_subject_area_id,
-					p.target_language_id, p_target_lang_id,
-					p.source_language_id, p_source_lang_id
-				) as relevancy,
-				p.price, p.company_id,
-				p.uom_id,p.task_type_id,
-				p.target_language_id,p.source_language_id,
-				p.subject_area_id,p.valid_from,
-				p.valid_through
-			    from im_trans_prices p
-			    where
-				p.uom_id = p_task_uom_id
-				and p.currency = p_currency
-			    )
-			) p
-		where
-			relevancy >= -200
+	ret = ''{1,2}'';
+
+	FOR row IN
+	    select *
+	    from (
+		select	u.user_id,
+			im_category_from_id(slang.skill_id) as source_lang,
+			im_category_from_id(tlang.skill_id) as target_lang
+		from	cc_users u
+			left outer join im_freelancers f on (
+				u.user_id = f.user_id
+			)
+			left outer join im_freelance_skills slang on (
+				u.user_id = slang.user_id
+				and slang.skill_type_id = 2000
+			)
+			left outer join im_freelance_skills tlang on (
+				u.user_id = tlang.user_id
+				and tlang.skill_type_id = 2002
+			)
+		where	1=1
+		) u
+	    where
+		substr(source_lang,1,2) = substr(p_source_lang,1,2)
+		and substr(target_lang,1,2) = substr(p_target_lang,1,2)
+	    order by u.user_id
 	LOOP
-		IF price_row.price < min_price THEN min_price = price_row.price; END IF;
-		IF price_row.price > max_price THEN max_price = price_row.price; END IF;
+		-- Price list - Check the relevant price for the
+		-- given task_type_id, source+target lang, currency and
+		-- quality level and build maximum and minimum price
+		FOR price_row IN
+			select
+				p.relevancy,
+				p.price
+			from	(
+				    (select
+					im_trans_prices_calc_relevancy (
+						p.company_id,  p.company_id,
+						p.task_type_id, p_task_type_id,
+						p.subject_area_id, p_subject_area_id,
+						p.target_language_id, p_target_lang_id,
+						p.source_language_id, p_source_lang_id
+					) as relevancy,
+					p.price, p.company_id,
+					p.uom_id,p.task_type_id,
+					p.target_language_id,p.source_language_id,
+					p.subject_area_id,p.valid_from,
+					p.valid_through
+				    from im_trans_prices p,
+					 acs_rels r
+				    where
+					r.object_id_one = p.company_id
+					and r.object_id_two = row.user_id
+					and p.uom_id = p_task_uom_id
+					and currency = p_currency
+				    )
+				) p
+			where
+				relevancy >= 0
+		LOOP
+
+			IF price_row.price < min_price THEN min_price = price_row.price; END IF;
+			IF price_row.price > max_price THEN max_price = price_row.price; END IF;
+
+		END LOOP;
+
 	END LOOP;
+
 	ret[1] = min_price;
 	ret[2] = max_price;
         RETURN ret;
 end;' language 'plpgsql';
-select im_freelance_score_translation_price (0,0,10067,10075,324,'EUR');
+
+
+-- Test example to score freelancer in PtDemo
+-- select im_freelance_score_translation_price (0,0,10067,10075,324,'EUR');
 
 
 
@@ -238,7 +288,7 @@ BEGIN
 
 		-- Combine the various scores
 		lang_score = lang_match_value / 6;
-		price_score = (price_row.price - min_price) / (max_price - min_price);
+		price_score = 1 - ((price_row.price - min_price) / (max_price - min_price));
 		retscore.score = 
 			lang_score * p_lang_weight +
 			price_score * p_price_weight
@@ -272,7 +322,8 @@ end;' language 'plpgsql';
 --	p_task_uom_id
 --	p_currency
 
-select * from im_freelance_score_translation (0, 0, 10067, 10075, 324, 'EUR');
+-- Test query
+-- select * from im_freelance_score_translation (0, 0, 10067, 10075, 324, 'EUR');
 
 
 
