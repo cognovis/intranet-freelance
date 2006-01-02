@@ -53,7 +53,7 @@ select
 	c.note,
 	c.current_information,
 	f.bank_account, f.bank, f.payment_method_id, f.rec_source, 
-	f.rec_status_id, f.rec_test_type, f.rec_test_result_id,
+	f.rec_status_id, f.rec_test_type, f.rec_test_result_id
 	$extra_select
 from 
 	persons p,
