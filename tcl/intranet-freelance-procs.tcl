@@ -456,7 +456,7 @@ where
     
     set freelance_sql_1 "
 select
-	pe.first_names || pe.last_name as name,
+	pe.first_names || ' ' || pe.last_name as name,
 	pe.person_id as user_id,
 	im_freelance_skill_list(pe.person_id, :sl) as source_languages,
 	im_freelance_skill_list(pe.person_id, :tl) as target_languages,
@@ -489,6 +489,9 @@ from
 	) mu
 where
 	pe.person_id = mu.user_id
+order by
+	pe.last_name,
+	pe.first_names
 "
 
     set freelance_header_html "
@@ -507,7 +510,7 @@ where
     db_foreach freelance $freelance_sql_1 {
 	append freelance_body_html "
 	<tr$bgcolor([expr $ctr % 2])>
-	  <td><a href=users/view?[export_url_vars user_id]>$name</a></td>
+	  <td><a href=users/view?[export_url_vars user_id]><nobr>$name</nobr></a></td>
 	  <td>$source_languages</td>
 	  <td>$target_languages</td>
 	  <td>$subject_area</td>
