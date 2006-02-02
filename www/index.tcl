@@ -299,6 +299,37 @@ from
 }
 
 # ---------------------------------------------------------------
+# Freelance Filter Extensions
+# ---------------------------------------------------------------
+
+
+set skill_sql "
+	select
+		st.category as skill_type,
+		st.category_description as skill_category
+	from
+		im_categories st
+	where
+		st.category_type = 'Intranet Skill Type'
+	order by 
+		st.category_id
+"
+
+set skill_filter_html ""
+db_foreach skills $skill_sql {
+    append skill_filter_html "
+<tr>
+<td>$skill_type</td>
+<td>
+[im_category_select -include_empty_p 1 -plain_p 1 -include_empty_name "All" $skill_category skill_type ""]
+</td>
+</tr>
+"
+}
+
+
+
+# ---------------------------------------------------------------
 # 6. Format the Filter
 # ---------------------------------------------------------------
 
@@ -330,6 +361,9 @@ set filter_html "
       <input type=submit value=\"[_ intranet-freelance.Go]\" name=submit>
     </td>
   </tr>
+
+  $skill_filter_html
+
 </table>
 </form>
 "
