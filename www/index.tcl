@@ -36,8 +36,8 @@ ad_page_contract {
     { view_name "freelancers_list" }
     { rec_status_id 0 }
     { rec_test_result_id 0 }
+    skill_type_filter:array,optional
 }
-
 
 #    { rec_status_id "[im_freelance_recruiting_status_rest_evaluated]"}
 #    { rec_test_result_id "[im_freelance_recruiting_test_result_a]" }
@@ -228,6 +228,35 @@ if {$rec_test_result_id} {
     lappend extra_wheres "f.rec_test_result_id = :rec_test_result_id"
 }
 
+
+# Add extra_wheres according to freelance skills
+set skill_sql "
+	select	st.category_id as skill_type_id,
+		st.category as skill_type,
+		st.category_description as skill_category
+	from	im_categories st
+	where	st.category_type = 'Intranet Skill Type'
+	order by st.category_id
+"
+
+db_foreach skills $skill_sql {
+    set default ""
+    if {[info exists skill_type_filter($skill_type_id)]} {
+	set default $skill_type_filter($skill_type_id)
+	set default [expr $default + 0]
+	ns_log Notice "intranet-freelance/index: Found skill_type_id=$skill_type_id default=$default"
+    }
+
+    if {"" != $default && 0 != $default} {
+	lappend extra_wheres "u.user_id in (
+		select	user_id
+		from	im_freelance_skills
+		where	skill_type_id = $skill_type_id
+			and skill_id = $default
+	)"
+    }
+}
+
 if { ![empty_string_p $letter] && [string compare $letter "ALL"] != 0 && [string compare $letter "SCROLL"] != 0 } {
     set letter [string toupper $letter]
     lappend extra_wheres "im_first_letter_default_to_a(p.last_name)=:letter"
@@ -302,26 +331,38 @@ from
 # Freelance Filter Extensions
 # ---------------------------------------------------------------
 
-
 set skill_sql "
-	select
+	select	st.category_id as skill_type_id,
 		st.category as skill_type,
 		st.category_description as skill_category
-	from
-		im_categories st
-	where
-		st.category_type = 'Intranet Skill Type'
-	order by 
-		st.category_id
+	from	im_categories st
+	where	st.category_type = 'Intranet Skill Type'
+	order by st.category_id
 "
 
+ns_log Notice "intranet-freelance/index: skill_type_filter names = [array names skill_type_filter]"
 set skill_filter_html ""
 db_foreach skills $skill_sql {
+
+    ns_log Notice "intranet-freelance/index: Checking for skill_type_id=$skill_type_id"
+    set default ""
+    if {[info exists skill_type_filter($skill_type_id)]} { 
+	set default $skill_type_filter($skill_type_id)
+	ns_log Notice "intranet-freelance/index: Found skill_type_id=$skill_type_id default=$default"
+    }
+
     append skill_filter_html "
 <tr>
 <td>$skill_type</td>
 <td>
-[im_category_select -include_empty_p 1 -plain_p 1 -include_empty_name "All" $skill_category skill_type ""]
+[im_category_select \
+     -include_empty_p 1 \
+     -plain_p 1 \
+     -include_empty_name "All" \
+     $skill_category \
+     skill_type_filter.$skill_type_id \
+     $default \
+]
 </td>
 </tr>
 "
@@ -343,6 +384,9 @@ set filter_html "
       [_ intranet-freelance.Filter_Freelancers]
     </td>
   </tr>
+
+  $skill_filter_html
+
   <tr>
     <td valign=top>[_ intranet-freelance.Recruiting_Status]:</td>
     <td valign=top>
@@ -361,9 +405,6 @@ set filter_html "
       <input type=submit value=\"[_ intranet-freelance.Go]\" name=submit>
     </td>
   </tr>
-
-  $skill_filter_html
-
 </table>
 </form>
 "
@@ -429,9 +470,9 @@ db_foreach query $query {
 # Show a reasonable message when there are no result rows:
 if { [empty_string_p $table_body_html] } {
     set table_body_html "
-        <tr><td colspan=$colspan><ul><li><b> 
-        [_ intranet-freelance.lt_There_are_currently_n]
-        </b></ul></td></tr>"
+	<tr><td colspan=$colspan><ul><li><b> 
+	[_ intranet-freelance.lt_There_are_currently_n]
+	</b></ul></td></tr>"
 }
 
 if { $ctr == $how_many && $end_idx < $total_in_limited } {
