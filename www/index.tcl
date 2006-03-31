@@ -37,10 +37,8 @@ ad_page_contract {
     { rec_status_id 0 }
     { rec_test_result_id 0 }
     skill_type_filter:array,optional
+    { worked_with_company_id "" }
 }
-
-#    { rec_status_id "[im_freelance_recruiting_status_rest_evaluated]"}
-#    { rec_test_result_id "[im_freelance_recruiting_test_result_a]" }
 
 # ---------------------------------------------------------------
 # User List Page
@@ -228,6 +226,19 @@ if {$rec_test_result_id} {
     lappend extra_wheres "f.rec_test_result_id = :rec_test_result_id"
 }
 
+# Check that the user has been a member of a project for Customer
+if {"" != $worked_with_company_id} {
+    lappend extra_wheres "u.user_id in (
+	select distinct
+		r.object_id_two as user_id
+	from	acs_rels r,
+		im_projects p
+	where
+		p.company_id = :worked_with_company_id
+		and r.object_id_one = p.project_id
+    )"
+}
+
 
 # Add extra_wheres according to freelance skills
 set skill_sql "
@@ -397,6 +408,12 @@ set filter_html "
     <td valign=top>[_ intranet-freelance.lt_Recruiting_Test_Resul]:</td>
     <td valign=top>
       [im_select rec_test_result_id $rec_test_results $rec_test_result_id]
+    </td>
+  </tr>
+  <tr>
+    <td valign=top>[lang::message::lookup "" intranet-freelance.Worked_with_customer "Has already worked<br>with customer"]:</td>
+    <td valign=top>
+      [im_company_select worked_with_company_id $worked_with_company_id "" "Customer"]
     </td>
   </tr>
   <tr>
