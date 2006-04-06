@@ -210,7 +210,7 @@ append skill_table "
 	</tr>
 	<tr>
 	  <td>
-[im_category_select_plain -include_empty_p 0 $value_range_category_type "add_skill_id" ""]
+[im_category_select_plain -translate_p 0 -include_empty_p 0 $value_range_category_type "add_skill_id" ""]
 	  </td>
 	  <td colspan=3>
 	    <input type=submit name=button_add value=\"[_ intranet-freelance.Add]\" name=submit>
