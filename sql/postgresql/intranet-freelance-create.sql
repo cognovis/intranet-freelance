@@ -188,7 +188,7 @@ select im_component_plugin__new (
 	null,			   -- creation_user
 	null,			   -- creation_ip
 	null,			   -- context_id
-	'freelance list Component',     -- plugin_name
+	'Freelance List Component',     -- plugin_name
 	'intranet-freelance',	   -- package_name
 	'bottom',		       -- location
 	'/intranet/member-add',	 -- page_url
