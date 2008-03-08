@@ -34,7 +34,7 @@ insert into im_views (view_id, view_name, visible_for) values (
 51, 'user_view_freelance', '');
 insert into im_views (view_id, view_name, visible_for) values (
 52, 'freelancers_list', '');
-
+-- 53 reserved for trans_freelancers_list
 
 
 --------------------------------------------------------------
