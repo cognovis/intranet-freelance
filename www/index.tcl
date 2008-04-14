@@ -158,6 +158,11 @@ where	view_id=:view_id
 order by
 	sort_order"
 
+
+# ad_return_complaint 1 $column_sql
+# ad_return_complaint 1 $view_id
+
+
 db_foreach column_list_sql $column_sql {
     if {"" == $visible_for || [eval $visible_for]} {
 	lappend column_headers "$column_name"
