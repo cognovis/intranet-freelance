@@ -162,6 +162,9 @@ order by
 # ad_return_complaint 1 $column_sql
 # ad_return_complaint 1 $view_id
 
+set s_word_price ""
+set hour_price ""
+
 
 db_foreach column_list_sql $column_sql {
     if {"" == $visible_for || [eval $visible_for]} {
