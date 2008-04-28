@@ -1,4 +1,4 @@
--- upgrade-3.2.11.0.0-3.2.12.0.0.sql
+-- upgrade-3.2.9.0.0-3.3.0.0.0.sql
 
 -----------------------------------------------------------
 -- Skills Associated with other Objects
@@ -8,7 +8,6 @@
 -- preferably specialized in "Legal" or "Business".
 
 create sequence im_object_freelance_skill_seq;
-
 create table im_object_freelance_skill_map (
         object_skill_map_id     integer
                                 constraint im_o_skills_pk
