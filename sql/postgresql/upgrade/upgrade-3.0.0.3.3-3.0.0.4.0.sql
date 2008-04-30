@@ -7,6 +7,8 @@
 --
 -- @author frank.bergmann@project-open.com
 
+SELECT acs_log__debug('/packages/intranet-freelance/sql/postgresql/upgrade/upgrade-3.0.0.3.3-3.0.0.4.0.sql','');
+
 
 -- removed the "select ... from im_freelancers" into .xql file
 update im_view_columns set
@@ -14,10 +16,8 @@ update im_view_columns set
 	extra_where = '',
 	extra_select = ''
 where
-	column_id = 5200
-;
+	column_id = 5200;
 
 delete from im_view_columns
-where column_id = 5203
-;
+where column_id = 5203;
 
