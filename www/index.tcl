@@ -143,6 +143,7 @@ set column_vars [list]
 # Define the column headers and column contents that 
 # we want to show:
 #
+
 set view_id [db_string get_view_id "select view_id from im_views where view_name=:view_name" -default 0]
 if {!$view_id} { 
     ad_return_complaint 1 "<li>[_ intranet-freelance.lt_Internal_error_unknow] '$view_name'<br>
