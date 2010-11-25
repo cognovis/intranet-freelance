@@ -74,6 +74,7 @@ ad_page_contract {
 # ---------------------------------------------------------------
 
 set user_id [ad_maybe_redirect_for_registration]
+set current_user_id $user_id
 set page_title "[_ intranet-freelance.Users]"
 set context_bar [im_context_bar $page_title]
 set page_focus "im_header_form.keywords"
