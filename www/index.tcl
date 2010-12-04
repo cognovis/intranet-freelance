@@ -82,6 +82,12 @@ set return_url [im_url_with_query]
 set user_view_page "/intranet/users/view"
 set letter [string toupper $letter]
 
+# Set default values for the case that there are no results in the list
+set name ""
+set email ""
+set url ""
+
+
 
 # Get the ID of the group of users to show
 # Default 0 corresponds to the list of all users.
