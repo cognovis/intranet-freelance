@@ -81,6 +81,7 @@ set page_focus "im_header_form.keywords"
 set return_url [im_url_with_query]
 set user_view_page "/intranet/users/view"
 set letter [string toupper $letter]
+if {"NONE" == $letter} { set letter "ALL" }
 
 # Set default values for the case that there are no results in the list
 set name ""
