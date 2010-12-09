@@ -909,8 +909,7 @@ ad_proc im_freelance_find_matching_users {
     set skill_sql "
 	select distinct 
 		fosm.object_id,
-		o.object_type,
-		acs_object__name(fosm.object_id) as object_name
+		o.object_type
 		$skill_select_sql
 	from	im_object_freelance_skill_map fosm,
 		acs_objects o
@@ -929,7 +928,7 @@ ad_proc im_freelance_find_matching_users {
 	    set exp_weight [util_memoize "db_string exp_weight \"select aux_int1 from im_categories where category_id = $confirmed_experience_id\" -default 0"]
 	    set score [expr $score + $exp_weight]
 	}
-	set score_hash($object_id) [list $object_id $object_type $object_name $score]
+	set score_hash($object_id) [list $object_id $object_type $score]
     }
 
     return [array get score_hash]
@@ -1058,8 +1057,7 @@ ad_proc im_freelance_consulting_member_select_component {
     foreach oid [array names user_score_hash] {
 	set oinfo $user_score_hash($oid)
 	set object_type [lindex $oinfo 1]
-	set object_name [lindex $oinfo 2]
-	set score  [lindex $oinfo 3]
+	set score  [lindex $oinfo 2]
 
 	lappend user_score_list [list $oid $score]
 	lappend object_ids $oid
