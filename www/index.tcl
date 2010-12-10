@@ -89,6 +89,8 @@ set email ""
 set url ""
 
 
+# It doesn't make sense to have anything but freelancers here...
+set user_group_name "Freelancers"
 
 # Get the ID of the group of users to show
 # Default 0 corresponds to the list of all users.
