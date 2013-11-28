@@ -99,13 +99,12 @@ switch $user_group_name {
     }
     "Unregistered" { set user_group_id -1 }
     default {
-	set user_group_id [db_string user_group_id "select group_id from groups where group_name like :user_group_name" -default 0]
+	set user_group_id [db_string user_group_id "select group_id from groups where lower(group_name) = lower(:user_group_name)" -default 0]
 	set menu_select_label "users_[string tolower $user_group_name]"
     }
 }
 
 if {$user_group_id > 0} {
-
     # We have a group specified to show:
     # Check whether the user can "read" this group:
     set sql "select im_object_permission_p(:user_group_id, :user_id, 'read') from dual"
@@ -114,9 +113,7 @@ if {$user_group_id > 0} {
 	ad_return_complaint 1 "[_ intranet-freelance.lt_You_dont_have_permiss]"
 	return
     }
-
 } else {
-
     # The user requests to see all groups.
     # The most critical groups are company contacts...
     set company_group_id [db_string user_group_id "select group_id from groups where group_name like :user_group_name" -default 0]
