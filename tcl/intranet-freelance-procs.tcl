@@ -893,6 +893,7 @@ ad_proc im_freelance_add_required_skills {
 	if {[info exists experience_ids($sid)]} { set exp_id $experience_ids($sid) }
 	if {[info exists weight_ids($sid)]} { set weight_id $weight_ids($sid) }
 	
+	im_security_alert_check_integer -location im_freelance_add_required_skills -value $weight_id
 	set weight [util_memoize "db_string weight \"select aux_int1 from im_categories where category_id = $weight_id\" -default {}"]
 	if {"" == $weight} { set weight 1 }
 
