@@ -858,7 +858,7 @@ ad_proc im_freelance_find_matching_users {
 	    set confirmed_experience_id [expr "\$c$map_id"]
 
 	    if {"" == $confirmed_experience_id} { set confirmed_experience_id 0}
-	    set exp_weight [util_memoize "db_string exp_weight \"select aux_int1 from im_categories where category_id = $confirmed_experience_id\" -default 0"]
+	    set exp_weight [util_memoize [list db_string exp_weight "select aux_int1 from im_categories where category_id = $confirmed_experience_id" -default 0]]
 	    set score [expr $score + $exp_weight]
 	}
 	set score_hash($object_id) [list $object_id $object_type $object_name $score]
@@ -894,7 +894,7 @@ ad_proc im_freelance_add_required_skills {
 	if {[info exists weight_ids($sid)]} { set weight_id $weight_ids($sid) }
 	
 	im_security_alert_check_integer -location im_freelance_add_required_skills -value $weight_id
-	set weight [util_memoize "db_string weight \"select aux_int1 from im_categories where category_id = $weight_id\" -default {}"]
+	set weight [util_memoize [list db_string weight "select aux_int1 from im_categories where category_id = $weight_id" -default {}]]
 	if {"" == $weight} { set weight 1 }
 
 	set exists_p [db_string count "
