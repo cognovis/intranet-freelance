@@ -149,6 +149,42 @@ ad_proc -public im_user_skill_permissions { current_user_id user_id view_var rea
     im_user_permissions $current_user_id $user_id view read write admin
 }
 
+# ---------------------------------------------------------------
+# Freelance Skills Select
+# ---------------------------------------------------------------
+
+ad_proc im_freelance_skill_select { 
+    {-translate_p 0}
+    {-include_empty_p 1}
+    {-include_empty_name ""}
+    select_name
+    skill_type_id
+    { default "" }
+} {
+    Returns HTML code for a select box to choose the
+    skill of a specified skill type.
+} {
+    set bind_vars [ns_set create]
+
+    set skill_type [db_string skill_type "select aux_string1 from im_categories where category_id=:skill_type_id"]
+    if {"" == $skill_type} {
+        set skill_type [db_string skill_type "select category_description from im_categories where category_id=:skill_type_id"]
+    }
+
+    ns_set put $bind_vars skill_type $skill_type
+
+    set sql "
+        select	category_id,
+		category
+        from	im_categories
+        where	category_type = :skill_type
+		and (enabled_p = 't' OR enabled_p is NULL)
+        order by lower(category_id)
+    "
+
+    return [im_selection_to_select_box -translate_p $translate_p $bind_vars $select_name $sql $select_name $default]
+}
+
 
 # ----------------------------------------------------------------------
 # Freelance Info Component
@@ -785,6 +821,44 @@ ad_proc im_freelance_member_select_component {
     return $select_freelance
 }
 
+
+ad_proc im_freelance_gantt_resource_select_component {
+    -object_id:required
+    -return_url:required
+} {
+    Component that returns a formatted HTML table that allows
+    to select freelancers according to skill and to current
+    resource assignments.
+} {
+    set current_url [im_url_with_query]
+    set skill_component [im_object_skill_component -object_id $object_id -return_url $current_url]
+
+    set skill_sql "
+	select	*
+	from	im_object_freelance_skill_map fosm
+	where	fosm.object_id = :object_id
+    "
+
+    set user_ids [im_freelance_find_matching_users -object_id $object_id]
+
+    set start_date [db_string today "select to_char(now(), 'YYYY-MM-01')"]
+    # Use the end_date of the current project
+    set end_date [db_string today "select end_date::date from im_projects where project_id = :object_id" -default ""]
+    if {"" == $end_date} { set end_date [db_string today "select to_char(now()::date + 365, 'YYYY-01-01')"] }
+
+    set skill_select [im_freelance_consulting_member_select_component -object_id $object_id -return_url $return_url]
+
+    return "
+	<table width='100%'>
+	<tr>
+	$skill_component
+	</tr>
+	<tr>
+	$skill_select
+	</tr>
+	</table>
+    "
+}
 
 # ---------------------------------------------------------------
 # Find matching users
