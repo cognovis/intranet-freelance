@@ -1207,3 +1207,71 @@ ad_proc im_freelance_consulting_member_select_component {
 return $select_freelance
 }
 
+
+ad_proc im_freelance_append_skills_to_form { 
+    {-object_id ""}
+    {-object_subtype_id ""}
+    -form_id:required
+    {-form_display_mode "edit" }
+} {
+
+    if {"" == $object_subtype_id} { return 0 }
+
+    set user_id [ad_get_user_id]
+    
+    # Get the list of elements
+        
+    db_foreach skill_types {select skill_type_id, object_type_id, display_mode, aux_string1, aux_int1 from im_freelance_skill_type_map, im_categories where object_type_id = :object_subtype_id and category_id = skill_type_id and display_mode != 'null' order by sort_order} {
+    
+        set attribute_name "skill_$skill_type_id"
+
+        set pretty_name [im_category_from_id $skill_type_id]
+#        if {$aux_int1 eq 0} {       
+            set custom_parameters [list category_type "$aux_string1"]
+#        } else {
+#            set custom_parameters [list category_type "$aux_string1" multiple_p 1]
+#        }
+        
+        if {![template::element::exists $form_id "$attribute_name"]} {
+            template::element create $form_id "$attribute_name" \
+                -datatype "text" \
+                -optional \
+                -widget "im_category_tree" \
+                -label "$pretty_name" \
+                -custom $custom_parameters \
+                -mode $display_mode
+        }
+    }
+
+    if {$object_id ne "" && [template::form::is_request $form_id]} {
+        db_foreach skill_types {select skill_id,skill_type_id from im_object_freelance_skill_map where object_id = :object_id} {
+        
+            set attribute_name "skill_$skill_type_id"
+            template::element::set_value $form_id $attribute_name $skill_id
+        }
+    }
+}
+
+ad_proc im_freelance_store_skills_from_form { 
+    -object_id:required
+    {-object_subtype_id ""}
+    -form_id:required
+} {
+
+	db_dml delete "
+        delete from im_object_freelance_skill_map
+	where
+		object_id = :object_id and skill_type_id in (select skill_type_id from im_freelance_skill_type_map where display_mode != 'null')
+	"
+     
+    # For each of the skills find out if we have a value
+    db_foreach skill_types {select skill_type_id, object_type_id, display_mode, aux_string1 from im_freelance_skill_type_map, im_categories where object_type_id = :object_subtype_id and category_id = skill_type_id} {
+            
+        set attribute_name "skill_$skill_type_id"
+        
+        set value [template::element::get_value $form_id $attribute_name]
+        if {$value ne ""} {
+            im_freelance_add_required_skills -skill_ids $value -skill_type_id $skill_type_id -object_id $object_id
+        }
+    }
+}
