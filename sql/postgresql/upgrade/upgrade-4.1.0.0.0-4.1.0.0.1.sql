@@ -80,3 +80,29 @@ end;$body$ language 'plpgsql';
 
 select inline_0();
 drop function inline_0();
+
+create or replace function im_freelance_skill_list_html (integer, integer)
+returns varchar as '
+declare
+	p_user_id			alias for $1;
+	p_skill_type_id			alias for $2; 
+
+	v_skills			varchar;
+	c_user_skills			RECORD;
+BEGIN
+	v_skills := ''<ul>'';
+
+	FOR c_user_skills IN	
+		select	c.category
+		from	im_freelance_skills s,
+			im_categories c
+		where	s.user_id=p_user_id
+			and s.skill_type_id=p_skill_type_id
+			and s.skill_id=c.category_id
+		order by c.category 
+	LOOP
+		v_skills := v_skills || ''<li>'' || c_user_skills.category || ''</li>'';
+	END LOOP;
+	v_skills := v_skills || ''</ul>'';
+	RETURN v_skills;
+end;' language 'plpgsql';
