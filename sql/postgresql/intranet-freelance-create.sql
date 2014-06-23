@@ -463,3 +463,25 @@ SELECT im_report_new (
 	'
 );
 
+-- Skill mapping to object types
+-- Shamelessly inspired by dynfield type_attribute mapping
+
+create table im_freelance_skill_type_attribute_map (
+	skill_type_id		integer
+				constraint im_freelance_skill_type_attr_map_stype_nn
+				not null
+				constraint im_freelance_skill_type_attr_map_stype_fk
+				references im_categories,
+	object_type_id		integer
+				constraint im_freelance_skill_type_attr_map_otype_nn
+				not null
+				constraint im_freelance_skill_type_attr_map_otype_fk
+				references im_categories,
+	display_mode		varchar(10)
+				constraint im_freelance_skill_type_attr_map_dmode_nn
+				not null
+				constraint im_freelance_skill_type_attr_map_dmode_ck
+				check (display_mode in ('edit', 'display', 'none')),
+	help_text		text,
+	unique (skill_type_id, object_type_id)
+);
