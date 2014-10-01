@@ -206,7 +206,7 @@ append skill_table "
 if {[im_permission $current_user_id admin_categories]} {
     append skill_table "
 <A HREF=\"/intranet/admin/categories/?select_category_type=[ns_urlencode $value_range_category_type]\">
-        [im_gif new "Add a new %value_range_category_type%"]
+        [im_gif -translate_p 0 new "Add a new %value_range_category_type%"]
 	</A>"
 }
 append skill_table "
