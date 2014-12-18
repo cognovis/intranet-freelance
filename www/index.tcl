@@ -28,7 +28,6 @@ ad_page_contract {
     @author unknown@arsdigita.com
     @author Frank Bergmann (frank.bergmann@project-open.com)
 } {
-    { user_group_name:trim "Freelancers" }
     { order_by "Name" }
     { start_idx:integer 0 }
     { how_many:integer "" }
@@ -74,6 +73,8 @@ ad_page_contract {
 # ---------------------------------------------------------------
 
 set user_id [ad_maybe_redirect_for_registration]
+set user_group_name "Freelancers"
+
 set page_title "[_ intranet-freelance.Users]"
 set context_bar [im_context_bar $page_title]
 set page_focus "im_header_form.keywords"
