@@ -352,12 +352,13 @@ from
 # ---------------------------------------------------------------
 
 set skill_sql "
-	select	st.category_id as skill_type_id,
-		st.category as skill_type,
-		st.category_description as skill_category
-	from	im_categories st
-	where	st.category_type = 'Intranet Skill Type'
-	order by st.category_id
+        select  st.category_id as skill_type_id,
+                st.category as skill_type,
+                st.aux_string1 as skill_category
+        from    im_categories st
+        where   st.category_type = 'Intranet Skill Type'
+                and enabled_p = 't'
+        order by st.category_id
 "
 
 set skill_filter_html ""
