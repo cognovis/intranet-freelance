@@ -28,7 +28,6 @@ ad_page_contract {
     @author unknown@arsdigita.com
     @author Frank Bergmann (frank.bergmann@project-open.com)
 } {
-    { user_group_name:trim "Freelancers" }
     { order_by "Name" }
     { start_idx:integer 0 }
     { how_many:integer "" }
@@ -74,6 +73,8 @@ ad_page_contract {
 # ---------------------------------------------------------------
 
 set user_id [ad_maybe_redirect_for_registration]
+set user_group_name "Freelancers"
+
 set page_title "[_ intranet-freelance.Users]"
 set context_bar [im_context_bar $page_title]
 set page_focus "im_header_form.keywords"
@@ -354,12 +355,13 @@ from
 # ---------------------------------------------------------------
 
 set skill_sql "
-	select	st.category_id as skill_type_id,
-		st.category as skill_type,
-		st.category_description as skill_category
-	from	im_categories st
-	where	st.category_type = 'Intranet Skill Type'
-	order by st.category_id
+        select  st.category_id as skill_type_id,
+                st.category as skill_type,
+                st.aux_string1 as skill_category
+        from    im_categories st
+        where   st.category_type = 'Intranet Skill Type'
+                and enabled_p = 't'
+        order by st.category_id
 "
 
 set skill_filter_html ""

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<message_catalog package_key="intranet-freelance" package_version="3.4.0.7.0" locale="zh_CN" charset="utf-8">
+<message_catalog package_key="intranet-freelance" locale="zh_CN" charset="utf-8">
 
   <msg key="Account_Unavailable">帐户不可用</msg>
   <msg key="Add">添加</msg>
